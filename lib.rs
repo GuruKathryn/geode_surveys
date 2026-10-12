@@ -1363,6 +1363,59 @@ mod surveys {
             Ok(())
         }
 
+        // 13 🔴 Get A Specific Survey's Questions
+        #[ink(message)]
+        pub fn get_survey_by_id(&self,
+            survey_id: Hash
+        ) -> Available {
+
+            let mut results1 = Vec::new();
+            let mut results3 = Vec::new();
+            let mut results5 = Vec::new();
+
+            // check if it is in the 1Q mapping
+            if self.map_1q_id_to_survey.contains(survey_id) {
+                let thissurvey = self.map_1q_id_to_survey.get(survey_id).unwrap_or_default();
+                // if there is sufficient balance on this survey and it has not hit max responses, 
+                // include it 
+                if thissurvey.survey_balance > thissurvey.payout 
+                && thissurvey.payout > 0 
+                && thissurvey.total_responses < thissurvey.max_responses {
+                    results1.push(thissurvey);
+                }
+            }
+            // check if it is in the 3Q mapping
+            if self.map_3q_id_to_survey.contains(survey_id) {
+                let thissurvey = self.map_3q_id_to_survey.get(survey_id).unwrap_or_default();
+                // if there is sufficient balance on this survey and it has not hit max responses, 
+                // include it 
+                if thissurvey.survey_balance > thissurvey.payout 
+                && thissurvey.payout > 0 
+                && thissurvey.total_responses < thissurvey.max_responses {
+                    results3.push(thissurvey);
+                }
+            }
+            // check if it is in the 5Q mapping
+            if self.map_5q_id_to_survey.contains(survey_id) {
+                let thissurvey = self.map_5q_id_to_survey.get(survey_id).unwrap_or_default();
+                // if there is sufficient balance on this survey and it has not hit max responses, 
+                // include it 
+                if thissurvey.survey_balance > thissurvey.payout 
+                && thissurvey.payout > 0 
+                && thissurvey.total_responses < thissurvey.max_responses {
+                    results5.push(thissurvey);
+                }
+            }
+
+            let results = Available {
+                surveys1: results1,
+                surveys3: results3,
+                surveys5: results5,
+            };
+
+            results
+        }
+
         // END OF MESSAGE FUNCTIONS
 
     }
