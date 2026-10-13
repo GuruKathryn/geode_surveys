@@ -274,6 +274,16 @@ mod surveys {
         payout: Balance,
     }
 
+    #[ink(event)]
+    pub struct SurveyClosed {
+        #[ink(topic)]
+        owner: AccountId,
+        #[ink(topic)]
+        survey_id: Hash,
+        #[ink(topic)]
+        survey_name: Vec<u8>,
+    }
+
 
     // ERROR DEFINITIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -371,6 +381,7 @@ mod surveys {
             // if the data is too big or the payment too small, send an error
             if survey_name.len() > 600 || question_1.len() > 300 || question_2.len() > 300 
             || question_3.len() > 300 || question_4.len() > 300 || question_5.len() > 300 
+            || payout == 0 || max_responses == 0 
             || staked < minstake || mysurveys.len() > 399 {
                 return Err(Error::DataTooLarge);
             }
@@ -497,6 +508,7 @@ mod surveys {
 
             // if the data is too big or the payment too small, send an error
             if survey_name.len() > 600 || question_1.len() > 300 || question_2.len() > 300 
+            || payout == 0 || max_responses == 0 
             || question_3.len() > 300 || staked < minstake || mysurveys.len() > 399 {
                 return Err(Error::DataTooLarge);
             }
@@ -619,6 +631,7 @@ mod surveys {
 
             // if the data is too big or the payment too small, send an error
             if survey_name.len() > 600 || question_1.len() > 300 
+            || payout == 0 || max_responses == 0 
             || staked < minstake || mysurveys.len() > 399 {
                 return Err(Error::DataTooLarge);
             }
@@ -761,6 +774,14 @@ mod surveys {
                         }
                         self.top_surveys1.remove(index);
                     }
+
+                    // EMIT AN EVENT
+                    self.env().emit_event(SurveyClosed {
+                        owner: caller,
+                        survey_id: survey_id,
+                        survey_name: survey.survey_name, 
+                    });
+
                     // if the survey is not there, do nothing
                 }
                 if length==3 {
@@ -792,6 +813,14 @@ mod surveys {
                         }
                         self.top_surveys3.remove(index);
                     }
+
+                    // EMIT AN EVENT
+                    self.env().emit_event(SurveyClosed {
+                        owner: caller,
+                        survey_id: survey_id,
+                        survey_name: survey.survey_name, 
+                    });
+
                     // if the survey is not there, do nothing
                 }
                 if length==5 {
@@ -823,8 +852,17 @@ mod surveys {
                         }
                         self.top_surveys5.remove(index);
                     }
+
+                    // EMIT AN EVENT
+                    self.env().emit_event(SurveyClosed {
+                        owner: caller,
+                        survey_id: survey_id,
+                        survey_name: survey.survey_name, 
+                    });
+
                     // if the survey is not there, do nothing
                 }
+
             }
             else { 
                 return Err(Error::AccessDenied);
